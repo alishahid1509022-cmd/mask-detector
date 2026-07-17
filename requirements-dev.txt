@@ -1,0 +1,10 @@
+-r requirements.txt
+
+pytest>=8.0,<9
+pytest-mock>=3.12,<4
+black>=24.1,<25
+isort>=5.13,<6
+ruff>=0.3,<1
+mypy>=1.9,<2
+pre-commit>=3.6,<4
+types-Pillow

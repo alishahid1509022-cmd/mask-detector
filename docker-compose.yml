@@ -1,0 +1,36 @@
+# Convenience wrapper around `docker build` + `docker run` for local
+# development. NOT used by Streamlit Cloud or Render - they build directly
+# from the Dockerfile. See docs/deployment.md for the full guide, including
+# why webcam passthrough (the 'devices:' line below) only works when the
+# Docker daemon itself runs natively on Linux.
+#
+# Usage:
+#   docker compose up --build
+#   docker compose down
+
+services:
+  mask-detector:
+    build: .
+    image: mask-detector:local
+    ports:
+      - '8501:8501'
+    env_file:
+      - .env
+    volumes:
+      # Persist screenshots and logs on the host instead of losing them
+      # when the container is removed.
+      - ./Screenshots:/app/Screenshots
+      - ./logs:/app/logs
+    devices:
+      # Passes the host's first camera device into the container so
+      # cv2.VideoCapture(0) can actually open it.
+      #
+      # Only works when the Docker daemon runs natively on Linux (bare
+      # metal or a Linux VM). On macOS and Windows, Docker Desktop runs
+      # containers inside a hidden Linux VM that has no route to the
+      # host's USB/camera hardware, so this line has no effect there -
+      # comment it out on those platforms and run the app with a local
+      # virtualenv instead (see README > Installation) for a live webcam
+      # demo.
+      - '/dev/video0:/dev/video0'
+    restart: unless-stopped

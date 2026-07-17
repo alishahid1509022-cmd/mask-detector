@@ -1,0 +1,29 @@
+# Render Blueprint - lets you deploy this service with 'New +' > 'Blueprint'
+# in the Render dashboard instead of clicking through the web service form
+# by hand. See docs/deployment.md for the equivalent manual click-through
+# steps and, importantly, what does and doesn't work once this is running
+# on Render's servers (no physical webcam is attached to them).
+#
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: mask-detector
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter # free tier is too memory-constrained for torch + ultralytics
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: TARGET_FPS
+        value: '15'
+      - key: CONFIDENCE_THRESHOLD
+        value: '0.5'
+      - key: DEVICE
+        value: cpu
+      - key: INFERENCE_IMG_SIZE
+        value: '640'
+      - key: TTS_ENGINE
+        value: gtts
+      - key: LOG_LEVEL
+        value: INFO
+    autoDeployTrigger: commit

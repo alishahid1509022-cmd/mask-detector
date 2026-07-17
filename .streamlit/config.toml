@@ -1,0 +1,22 @@
+[theme]
+# Kept in sync with the palette defined in src/mask_detector/app.py's
+# inject_custom_css() (:root variables) so native Streamlit widgets -
+# primary buttons, sliders, focus rings - match the custom-styled cards,
+# chips, and banners instead of clashing with them.
+primaryColor = "#4F46E5"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F8FAFC"
+textColor = "#0F172A"
+font = "sans serif"
+
+[server]
+headless = true
+runOnSave = true
+fileWatcherType = "auto"
+maxUploadSize = 50
+
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = true

@@ -1,0 +1,40 @@
+# Version control / CI
+.git
+.gitignore
+.github
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments (never bake a host venv into the image)
+venv/
+.venv/
+env/
+
+# Secrets - pass these in at `docker run`/platform env-var time instead,
+# never bake them into an image layer.
+.env
+
+# Runtime output (created fresh inside the container)
+logs/
+Screenshots/
+
+# Model weights - excluded on purpose so every image build downloads a
+# known-good copy via `models/download_model.py` (see Dockerfile) instead
+# of silently baking in whatever happens to sit in the local models/
+# folder on the machine running `docker build`.
+models/*.pt
+models/*.onnx
+
+# Dev-only / not needed at runtime
+tests/
+docs/
+.vscode/
+.idea/
+.DS_Store
+*.md

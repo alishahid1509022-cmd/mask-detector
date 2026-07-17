@@ -1,0 +1,34 @@
+# Core detection pipeline
+opencv-python>=4.9,<5
+ultralytics>=8.1,<9
+# Upper-bounded below 2.5: numpy 2.5.0 started shipping type stubs that use
+# PEP 695 `type` statements, which mypy rejects when checking against this
+# project's `python_version = "3.10"` (see pyproject.toml's [tool.mypy]) -
+# `mypy src` fails immediately on `numpy/__init__.pyi` otherwise, even though
+# the actual application code has nothing to do with numpy's stubs. Revisit
+# this pin once mypy/numpy resolve that incompatibility upstream.
+numpy>=1.26,<2.5
+pillow>=10.2,<13
+
+# Automatic pretrained model download
+huggingface_hub>=0.20,<1
+
+# UI
+streamlit>=1.32,<2
+
+# Voice alerts
+pyttsx3>=2.90,<3
+gTTS>=2.5,<3
+# playsound provides *local playback* for the gTTS backend only - the default
+# TTS_ENGINE (pyttsx3) doesn't need it at all. It's intentionally left out of
+# this base install: the last release (1.3.0) ships a setup.py that breaks
+# under newer Python's stricter `inspect` behavior (fails on Python 3.12+,
+# confirmed broken on 3.13/3.14), which would otherwise make this entire
+# `pip install -r requirements.txt` fail. voice_alert.py already imports it
+# lazily and degrades gracefully (logs a warning instead of crashing) if it's
+# missing. If you're on Python <=3.11 and want gTTS's local playback, install
+# it separately: pip install playsound==1.3.0
+
+
+# Configuration
+python-dotenv>=1.0,<2
