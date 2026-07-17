@@ -1,6 +1,8 @@
+# Streamlit Community Cloud runs a mixed Debian base; naming older glib/
+# X11 packages here (libglib2.0-0, libsm6, ...) pulls bullseye versions that
+# conflict with the host (libffi7 / libpcre3 "not installable").
+#
+# With opencv-python-headless (see requirements.txt) we only need a tiny
+# OpenGL stub for cv2 to import, plus espeak for the optional pyttsx3 backend.
 libgl1
-libglib2.0-0
-libsm6
-libxext6
-libxrender1
 espeak
