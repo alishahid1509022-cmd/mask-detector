@@ -86,7 +86,7 @@ face-mask-detector/
 ├── .github/workflows/ci.yml   # lint + test on every push/PR
 ├── Dockerfile, .dockerignore  # container image, see docs/deployment.md
 ├── docker-compose.yml         # local convenience wrapper around Docker
-├── packages.txt, render.yaml  # Streamlit Cloud apt deps / Render blueprint
+├── render.yaml               # Render blueprint
 ├── docs/                      # architecture, performance, deployment notes, demo gif, screenshots
 ├── models/                    # model weights (git-ignored) + download script
 ├── src/mask_detector/         # application package
@@ -303,7 +303,7 @@ All four checks (plus `pytest`) run automatically on every push/PR via [`.github
 
 ## 🌐 Deployment
 
-The app can be deployed to Docker, Streamlit Community Cloud, and Render - full step-by-step instructions for all three (including a Dockerfile, docker-compose.yml, packages.txt, and a Render render.yaml blueprint, all included in this repo) live in [docs/deployment.md](docs/deployment.md).
+The app can be deployed to Docker, Streamlit Community Cloud, and Render - full step-by-step instructions for all three (including a Dockerfile, docker-compose.yml, and a Render render.yaml blueprint, all included in this repo) live in [docs/deployment.md](docs/deployment.md).
 
 **Read this before deploying:** this app captures video via `cv2.VideoCapture`, which opens a physical webcam on the machine the Streamlit process runs on (see [docs/architecture.md](docs/architecture.md#why-local-only-webcam-access) for why). None of the three platforms above have a physical camera attached to their servers, so on all of them the UI, dashboard, and sidebar deploy and run correctly, but clicking **Start Camera** shows a friendly camera-unavailable message by design rather than live detection. That makes these deployments genuinely useful for showcasing the UI/code to reviewers, but not for a live-webcam demo - for that, run it locally (see [Installation](#-installation)) or via Docker on a native Linux host with `--device` passthrough (see [docs/deployment.md](docs/deployment.md#1-docker)).
 

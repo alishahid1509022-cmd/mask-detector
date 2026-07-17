@@ -116,9 +116,15 @@ git push origin main
 
 (Streamlit Cloud deploys directly from a GitHub branch, so the repo needs to be on GitHub first.)
 
-### Step 2 - Add `packages.txt` (already included in this repo)
+### Step 2 - System packages (`packages.txt`)
 
-Streamlit Cloud reads a root-level [`packages.txt`](../packages.txt) file and `apt-get install`s every line in it before installing Python dependencies - this repo already ships one with the same system libraries the Dockerfile installs (`libgl1`, `libglib2.0-0`, `libsm6`, `libxext6`, `libxrender1`, `espeak`), so `import cv2` and offline voice alerts work out of the box on Streamlit Cloud too.
+This repo intentionally does **not** ship a `packages.txt`. Streamlit Cloud's
+host image mixes Debian releases, and common OpenCV apt deps
+(`libglib2.0-0`, `libsm6`, ...) often fail there with "held broken packages" /
+`libffi7` conflicts. We rely on `opencv-python-headless` +
+`ultralytics-opencv-headless` in `requirements.txt` instead, which don't need
+those system libraries. (Docker still installs them via the `Dockerfile` for
+local/Render container builds.)
 
 ### Step 3 - Create the app
 
@@ -149,7 +155,7 @@ Only set the variables you want to override - every one has a sensible default (
 
 ### Step 5 - Deploy
 
-Click **Deploy**. Streamlit Cloud installs `packages.txt` system packages, then `requirements.txt`, then starts the app. First builds typically take a few minutes (PyTorch is the largest dependency).
+Click **Deploy**. Streamlit Cloud installs `requirements.txt`, then starts the app. First builds typically take a few minutes (PyTorch is the largest dependency).
 
 ### Step 6 - What to expect
 
@@ -230,9 +236,9 @@ The full list of variables, defaults, and what each one does lives in [`.env.exa
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `ImportError: libGL.so.1: cannot open shared object file` | `opencv-python`'s compiled extension needs `libGL`/related libs that a minimal Debian image doesn't ship by default | Already handled in `Dockerfile`/`packages.txt` (`libgl1`, `libglib2.0-0`, `libsm6`, `libxext6`, `libxrender1`); if deploying without either of those, install the same packages yourself |
+| `ImportError: libGL.so.1: cannot open shared object file` | `opencv-python`'s GUI build needs display libs missing on minimal hosts | Use this repo's `opencv-python-headless` / `ultralytics-opencv-headless` pins (already in `requirements.txt`); Docker installs `libgl1` etc. via the `Dockerfile` |
 | "Could not open camera at index 0" / friendly camera-unavailable message on a cloud host | Expected - the host has no physical webcam attached | See the [webcam caveat](#read-this-first-the-webcam-caveat); run locally, or via Docker with `--device` on a native Linux host, for a live demo |
-| Voice alerts silent on a cloud host | `pyttsx3` needs `espeak` (installed via Dockerfile/`packages.txt`) *and* a working audio device, which containers/cloud hosts don't have; `gTTS` needs `playsound`'s Linux backend (GStreamer bindings), which may also be unavailable in a minimal container | Expected degradation - the app falls back automatically and never crashes; the on-screen alert banner remains fully functional regardless |
+| Voice alerts silent on a cloud host | `pyttsx3` needs `espeak` *and* a working audio device, which cloud hosts don't have; `gTTS` needs local audio playback too | Expected degradation - the app falls back automatically and never crashes; the on-screen alert banner remains fully functional regardless |
 | Slow or failing builds / out-of-memory | `torch` (pulled in by `ultralytics`) is a large dependency, and default free/starter tiers have limited CPU/RAM/build time | Lower `INFERENCE_IMG_SIZE`/`TARGET_FPS`, use a smaller model, or upgrade the plan |
 | Render health check failing | Health check path doesn't match Streamlit's endpoint | Confirm **Health Check Path** is exactly `/_stcore/health` |
 | Port binding errors on Render | App bound to a fixed port instead of Render's injected `$PORT` | Use this repo's `Dockerfile` (`${PORT:-8501}`) or Option B's start command (`--server.port=$PORT`) as-is |
